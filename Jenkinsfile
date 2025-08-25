@@ -17,4 +17,11 @@ pipeline {
       }
     }
   }
+  post {
+    success {
+      echo 'Pipeline completed successfully 🎉' [cite: 64]
+    }
+    failure {
+      echo 'Pipeline failed ❌' [cite: 67]
+    }
 }
