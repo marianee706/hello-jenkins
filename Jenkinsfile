@@ -1,52 +1,63 @@
+ตามที่ขอ นี่คือโค้ด Jenkinsfile ฉบับสมบูรณ์ที่รวมทุกขั้นตอนจากเอกสารที่คุณให้มา เพื่อให้คุณสามารถคัดลอกและนำไปใช้ได้ทันที
+
+```
 pipeline {
   agent any
+  parameters {
+    booleanParam(name: 'RUN_DEPLOY', defaultValue: true, description: 'Should we deploy?')
+  }
   stages {
     stage('Build') {
       steps {
-        echo 'Building the application...'
+        echo 'Building application...'
+      }
+    }
+    stage('Test in Parallel') {
+      parallel {
+        stage('Unit Tests') {
+          steps {
+            echo 'Running unit tests...'
+            sh 'sleep 5'
+          }
+        }
+        stage('Integration Tests') {
+          steps {
+            echo 'Running integration tests...'
+            sh 'sleep 5'
+          }
+        }
       }
     }
     stage('Test') {
       steps {
-        echo 'Running tests...'
+        sh 'echo "All tests passed!" > results.txt'
+        archiveArtifacts artifacts: 'results.txt', fingerprint: true
       }
     }
-    stage('Package') {
+    stage('Approval') {
       steps {
-        echo 'Creating package...'
-        // คำสั่ง zip อาจแตกต่างกันไปขึ้นอยู่กับระบบปฏิบัติการและไฟล์ของคุณ
-        // ตัวอย่างนี้จะบีบอัดไฟล์ทั้งหมดใน directory ปัจจุบัน
-        sh 'zip -r my-app.zip .'
-        sh 'ls -l' // เพิ่มคำสั่ง ls -l เพื่อแสดงไฟล์หลังจากการ package (แบบฝึกหัดที่ 1)
+        input "Do you want to proceed with deployment?"
       }
     }
     stage('Deploy') {
-      steps {
-        echo 'Deploying the application...'
+      when {
+        expression { return params.RUN_DEPLOY }
       }
-    }
-    // เพิ่ม Stage สำหรับแสดงรายการไฟล์ (แบบฝึกหัดที่ 1)
-    stage('List Workspace Files') {
       steps {
-        echo 'Listing files in workspace...'
-        sh 'ls -l'
+        echo 'Deploying application...'
       }
     }
   }
-  // เพิ่มบล็อก post สำหรับแจ้งเตือน (แบบฝึกหัดที่ 2)
   post {
-    always {
-      echo 'This will always run after the pipeline finishes.'
-    }
     success {
-      echo 'Pipeline completed successfully 🎉'
+      echo '✅ Pipeline finished successfully!'
     }
     failure {
-      echo 'Pipeline failed ❌'
+      echo '❌ Pipeline failed. Check logs!'
     }
-    // เพิ่มการ cleanup เช่น ลบไฟล์ zip หากไม่ต้องการเก็บไว้
-    // cleanup {
-    //    sh 'rm my-app.zip'
-    // }
+    always {
+      echo 'Pipeline completed (success or failure).'
+    }
   }
 }
+```
