@@ -19,9 +19,10 @@ pipeline {
   }
   post {
     success {
-      echo 'Pipeline completed successfully 🎉' [cite: 64]
+      echo 'Pipeline completed successfully 🎉'
     }
     failure {
-      echo 'Pipeline failed ❌' [cite: 67]
+      echo 'Pipeline failed ❌'
     }
+  }
 }
