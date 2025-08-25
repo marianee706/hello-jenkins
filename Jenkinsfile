@@ -16,10 +16,5 @@ pipeline {
         echo 'Deploying the application...'
       }
     }
-    stage('List Files') {
-      steps {
-        sh 'ls -l'
-      }
-    }
   }
 }
