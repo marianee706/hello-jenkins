@@ -46,7 +46,7 @@ pipeline {
     }
     // เพิ่มการ cleanup เช่น ลบไฟล์ zip หากไม่ต้องการเก็บไว้
     // cleanup {
-    //   sh 'rm my-app.zip'
+    //    sh 'rm my-app.zip'
     // }
   }
 }
